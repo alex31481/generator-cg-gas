@@ -18,7 +18,7 @@ angular.module('<%= _.camelize(appname) %>').config(function($stateProvider, $ur
 
 });
 <% } %>
-angular.module('<%= _.camelize(appname) %>').run(function($rootScope,<% if(uirouter) { print('$state,$stateParams'); } else { print(''); } %>) {
+angular.module('<%= _.camelize(appname) %>').run(function($rootScope<% if(uirouter) { print(',$state,$stateParams'); } else { print(''); } %>) {
 
    <% if(uirouter) { print('$rootScope.$state=$state;\n$rootScope.$stateParams=$stateParams;'); } else { print(''); } %>
 
