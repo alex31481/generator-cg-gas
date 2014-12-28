@@ -191,7 +191,7 @@ exports.askForDir = function(type,that,module,ownDir,cb){
     if (!configedDir){
         configedDir = '.';
     }
-		console.log('************adding moddules to path************ '+module.primary)
+		//removing the modules dir in module folder
     var defaultDir;
 		if(module.primary){
 		   defaultDir = path.join(that.dir+'/modules/',configedDir,'/');
