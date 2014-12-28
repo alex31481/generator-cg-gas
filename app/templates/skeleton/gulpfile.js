@@ -1,6 +1,7 @@
 //'use strict';
 // generated on <%= (new Date).toISOString().split('T')[0] %> using <%= pkg.name %> <%= pkg.version %>
 
+var appConfig = require('./package.json');
 var config = require('./build/build.config.js');
 var karmaConfig = require('./build/karma.config.js');
 var protractorConfig = require('./build/protractor.config.js');
@@ -115,7 +116,7 @@ gulp.task('html', function() {
   .pipe($.replace('<!-- template-holder -->','<script src="scripts/templates.js"></script>'))
   .pipe(assets)
   .pipe($.sourcemaps.init())
-  .pipe($.if('**/*app.js',$.replace('/**template-holder**/',',"templates"')))
+  .pipe($.if('**/*app.js',$.replace(new RegExp(appConfig.name+'\\u0027\\s*,\\s*\\u005b','i'),appConfig.name+'\', ["templates",')))
   .pipe($.if('**/*.js', $.ngAnnotate()))
   .pipe($.if('**/*.js', $.uglify({
     mangle: false,
