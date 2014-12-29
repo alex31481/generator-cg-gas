@@ -52,7 +52,7 @@ PartialGenerator.prototype.files = function files() {
         var partialUrl = this.dir + this.name + '.html';
         //fixed for both slashes windows or unix style directory divider
         partialUrl=partialUrl.substr(4);
-        console.log("url after replace "+partialUrl);
+        
         cgUtils.injectRoute(this.module.file,this.config.get('uirouter'),this.name,this.route,partialUrl,this);
     }
 
