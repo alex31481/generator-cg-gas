@@ -17,7 +17,7 @@ module.exports = {
   js: [
     '!app/vendor/**/*.js',
     '!app/test/unit-results/**/*.js',
-    'app/**/.js',   //unit
+    'app/**/*.js',   //unit
   ],
   index: 'app/index.html',
   assets: 'app/assets/**',
