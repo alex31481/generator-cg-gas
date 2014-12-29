@@ -239,7 +239,7 @@ gulp.task('serve', ['build'], function() {
   gulp.watch(config.html, reload);
   gulp.watch(config.scss, ['sass', reload]);
   gulp.watch(config.js, ['jshint']);
-  gulp.watch(config.tpl, ['templates', reload]);
+  gulp.watch(config.js, reload);
   gulp.watch(config.assets, reload);
 });
 
