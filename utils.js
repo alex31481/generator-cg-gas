@@ -143,6 +143,30 @@ exports.getParentModule = function(dir) {
 
 
 
+exports.askForSubSection = function(type, that, cb) {
+    var mainModule = ngParseModule.parse(exports.SRC_APP + 'app.js');
+    mainModule.primary = true;
+    var subSections = that.config.get('sub-sections');
+
+    var choices = _.pluck(subSections, 'name');
+    var prompts = [{
+        name: 'subSection',
+        message: 'Which sub-section would you like to place the new ' + type + '?',
+        type: 'list',
+        choices: choices,
+        default: 0
+    }];
+    that.prompt(prompts, function(props) {
+        console.log('got sub-section: ' + props.subSection);
+        var subDir = _.where(subSections, {
+            name: props.subSection
+        })[0].dir;
+        cb.bind(that)(mainModule, subDir);
+    });
+}
+
+
+
 exports.askForParent = function(type, that, cb) {
     var mainModule = ngParseModule.parse(exports.SRC_APP + 'app.js');
     mainModule.primary = true;
@@ -151,20 +175,29 @@ exports.askForParent = function(type, that, cb) {
         exports.askForModule(type, that, cb);
     } else {
 
-        var choices = [mainModule.name + ' (Primary Application Module)', 
+        var choices = [mainModule.name + ' (Primary Application Module)',
             'Other Modules', 'Sub-Sections'
         ];
         var prompts = [{
-            name: 'parent',
-            message: 'Which parent would you like to place the new ' + type + '?',
+            name: 'parent_name',
+            message: 'Where would you like to place the new ' + type + '?',
             type: 'list',
             choices: choices,
             default: 0
         }];
 
         that.prompt(prompts, function(props) {
-            console.log('got here with '+JSON.stringify(props));
-            cb.bind(that)(mainModule);
+            console.log('got here with ' + JSON.stringify(props));
+            var i = choices.indexOf(props.parent_name);
+            if (i === 0) {
+                cb.bind(that)(mainModule);
+            }
+            if (i === 1) {
+                exports.askForModule(type, that, cb);
+            }
+            if (i === 2) {
+                exports.askForSubSection(type, that, cb);
+            }
         });
 
 
@@ -185,7 +218,7 @@ exports.askForModule = function(type, that, cb) {
     }
 
     var choices = _.pluck(modules, 'name');
-    choices.unshift(mainModule.name + ' (Primary Application Module)');
+    //choices.unshift(mainModule.name + ' (Primary Application Module)');
 
     if (that.options.selectedmodule === undefined) {
         var prompts = [{
@@ -202,11 +235,7 @@ exports.askForModule = function(type, that, cb) {
 
             var module;
 
-            if (i === 0) {
-                module = mainModule;
-            } else {
-                module = ngParseModule.parse(modules[i - 1].file);
-            }
+            module = ngParseModule.parse(modules[i].file);
 
             cb.bind(that)(module);
         }.bind(that));
@@ -282,10 +311,12 @@ exports.askForModule = function(type, that, cb) {
 
 };
 */
-exports.askForDir = function(type, that, module, ownDir, cb) {
+exports.askForDir = function(type, that, module, ownDir, cb, subSectionDir) {
 
 
     var mainModule = ngParseModule.parse(exports.SRC_APP + 'app.js');
+
+
     if (!module) {
         module = mainModule;
     }
@@ -299,7 +330,8 @@ exports.askForDir = function(type, that, module, ownDir, cb) {
 
     if (!configedDir) {
         configedDir = '.';
-    }     //removing the modules dir in module folder
+    } //removing the modules dir in module folder
+    
     var defaultDir;
 
     if (module.primary) {
@@ -309,6 +341,10 @@ exports.askForDir = function(type, that, module, ownDir, cb) {
     }
 
     defaultDir = path.relative(process.cwd(), defaultDir);
+
+    if (subSectionDir) {
+        defaultDir = subSectionDir;
+    }
 
     if (ownDir) {
         defaultDir = path.join(defaultDir, that.name);
@@ -381,11 +417,12 @@ exports.askForDir = function(type, that, module, ownDir, cb) {
 
 exports.askForModuleAndDir = function(type, that, ownDir, cb) {
     console.log('got here asking for module and dir');
-    exports.askForParent(type, that, function(module) {
-        exports.askForDir(type, that, module, ownDir, cb);
-    });    
+    exports.askForParent(type, that, function(module, subDir) {
+        console.log(' sub-section dir is '+subDir);
+        exports.askForDir(type, that, module, ownDir, cb, subDir);
+    });
 
-   /* exports.askForModule(type, that, function(module) {
-        exports.askForDir(type, that, module, ownDir, cb);
-    });*/
+    /* exports.askForModule(type, that, function(module) {
+         exports.askForDir(type, that, module, ownDir, cb);
+     });*/
 };

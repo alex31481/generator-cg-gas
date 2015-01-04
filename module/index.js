@@ -23,8 +23,9 @@ util.inherits(ModuleGenerator, yeoman.generators.NamedBase);
 ModuleGenerator.prototype.askFor = function askFor() {
     var cb = this.async();
     var name = this.name;
-    var defaultDir = 'app/modules/'+ path.join(this.name,'/'); //exports.SRC_APP
-
+    var defaultDir = 'app/components/'+ path.join(this.name,'/'); //exports.SRC_APP
+    var subSections = this.config.get('sub-sections');
+    var choices = _.pluck(subSections,name);
 
     if(this.options.moduleoptions===undefined){
         var prompts = [
@@ -80,6 +81,7 @@ ModuleGenerator.prototype.askFor = function askFor() {
 ModuleGenerator.prototype.files = function files() {
     if(this.options.moduleoptions===undefined){
         var module = cgUtils.getParentModule(path.join(this.dir,'..'));
+        console.log('dir is '+path.join(this.dir,'..'))
         module.dependencies.modules.push(_.camelize(this.name));
         module.save();
         this.log.writeln(chalk.green(' updating') + ' %s',path.basename(module.file));

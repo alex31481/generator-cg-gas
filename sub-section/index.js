@@ -32,7 +32,7 @@ SubSectionGenerator.prototype.files = function files() {
 
 	//fixed for both slashes windows or unix style directory divider
 	partialUrl = partialUrl.substr(4);
-
+	
 	cgUtils.injectRoute(this.module.file, this.config.get('uirouter'), this.name, this.name, partialUrl, this);
 
 	var sections = this.config.get('sub-sections');
