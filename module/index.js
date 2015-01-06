@@ -78,14 +78,15 @@ ModuleGenerator.prototype.askFor = function askFor() {
 
 };
 
+
+
+
 ModuleGenerator.prototype.files = function files() {
     if(this.options.moduleoptions===undefined){
         var module = cgUtils.getParentModule(path.join(this.dir,'..'));
-        console.log('dir is '+path.join(this.dir,'..'))
         module.dependencies.modules.push(_.camelize(this.name));
         module.save();
         this.log.writeln(chalk.green(' updating') + ' %s',path.basename(module.file));
-
         cgUtils.processTemplates(this.name,this.dir,'module',this,null,null,module);
 
         var modules = this.config.get('modules');
@@ -95,5 +96,10 @@ ModuleGenerator.prototype.files = function files() {
         modules.push({name:_.camelize(this.name),file:path.join(this.dir,this.name + '.js')});
         this.config.set('modules',modules);
         this.config.save();
+        if(this.dir.indexOf('app'+path.sep+'components'+path.sep)===-1) {
+            console.log('trying to save components');
+            cgUtils.saveAsSubSection(this);
+        }
+        //cgUtils.saveAsSubSection(this);
     }
 };

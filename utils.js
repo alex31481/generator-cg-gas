@@ -54,9 +54,10 @@ exports.processTemplates = function(name, dir, type, that, defaultDir, configNam
             var customTemplateName;
 
             if ((type === 'partial' && template.indexOf('partial') >= 0) ||
-                type === 'module' || name.indexOf(type) >= 0 ||
                 (type === 'sub-section' && template.indexOf('partial') >= 0)) {
                 customTemplateName = template.replace('partial', name);
+            } else if (type === 'module') {
+                customTemplateName = template.replace(type, name);
             } else {
                 customTemplateName = name + '-' + template;
             }
@@ -234,7 +235,7 @@ exports.askForModule = function(type, that, cb) {
             var i = choices.indexOf(props.module);
 
             var module;
-
+            console.log('module file at ' + modules[i].file);
             module = ngParseModule.parse(modules[i].file);
 
             cb.bind(that)(module);
@@ -331,13 +332,13 @@ exports.askForDir = function(type, that, module, ownDir, cb, subSectionDir) {
     if (!configedDir) {
         configedDir = '.';
     } //removing the modules dir in module folder
-    
+
     var defaultDir;
 
     if (module.primary) {
-        defaultDir = path.join(that.dir + '/components/', configedDir, '/');
+        defaultDir = that.dir + '/components/';
     } else {
-        defaultDir = path.join(that.dir + '/', configedDir, '/');
+        defaultDir = that.dir + '/';
     }
 
     defaultDir = path.relative(process.cwd(), defaultDir);
@@ -347,7 +348,11 @@ exports.askForDir = function(type, that, module, ownDir, cb, subSectionDir) {
     }
 
     if (ownDir) {
-        defaultDir = path.join(defaultDir, that.name);
+        if (type === 'sub-section') {
+            defaultDir = path.join(defaultDir, that.name );
+        } else {
+            defaultDir = path.join(defaultDir, that.name + '-' + type);
+        }
     }
 
     defaultDir = path.join(defaultDir, '/');
@@ -418,7 +423,7 @@ exports.askForDir = function(type, that, module, ownDir, cb, subSectionDir) {
 exports.askForModuleAndDir = function(type, that, ownDir, cb) {
     console.log('got here asking for module and dir');
     exports.askForParent(type, that, function(module, subDir) {
-        console.log(' sub-section dir is '+subDir);
+        console.log(' sub-section dir is ' + subDir);
         exports.askForDir(type, that, module, ownDir, cb, subDir);
     });
 
@@ -426,3 +431,22 @@ exports.askForModuleAndDir = function(type, that, ownDir, cb) {
          exports.askForDir(type, that, module, ownDir, cb);
      });*/
 };
+
+
+exports.saveAsSubSection = function(generator) {
+    var sections = generator.config.get('sub-sections');
+    if (!sections) {
+        sections = [];
+    }
+    console.log(sections);
+    //added code to maintain linux/windows compatiblility
+    var normalizedDir = generator.dir.replace('\\', '/');
+    normalizedDir = normalizedDir.substring(0, normalizedDir.length - 1) + '/';
+    sections.push({
+        name: _.camelize(generator.name),
+        dir: normalizedDir
+    });
+    generator.config.set('sub-sections', sections);
+    console.log('writing to save ');
+    generator.config.save();
+}

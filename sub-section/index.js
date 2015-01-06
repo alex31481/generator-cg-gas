@@ -32,9 +32,10 @@ SubSectionGenerator.prototype.files = function files() {
 
 	//fixed for both slashes windows or unix style directory divider
 	partialUrl = partialUrl.substr(4);
-	
-	cgUtils.injectRoute(this.module.file, this.config.get('uirouter'), this.name, this.name, partialUrl, this);
 
+	cgUtils.injectRoute(this.module.file, this.config.get('uirouter'), this.name, this.name, partialUrl, this);
+	cgUtils.saveAsSubSection(this);
+/*
 	var sections = this.config.get('sub-sections');
 	if (!sections) {
 		sections = [];
@@ -42,7 +43,7 @@ SubSectionGenerator.prototype.files = function files() {
 
 
 
-	//added code to maintain linux/windows compatiblility
+	
 	var normalizedDir = this.dir.replace('\\','/');
 	normalizedDir = normalizedDir.substring(0,normalizedDir.length-1)+'/';
 	sections.push({
@@ -51,5 +52,5 @@ SubSectionGenerator.prototype.files = function files() {
 	});
 	this.config.set('sub-sections', sections);
 	this.config.save();
-
+*/
 };
